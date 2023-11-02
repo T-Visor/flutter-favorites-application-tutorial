@@ -1,4 +1,5 @@
 // Documentation: https://codelabs.developers.google.com/codelabs/flutter-codelab-first#6
+// On responsiveness
 
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
@@ -71,10 +72,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var iconSize = 40.0; // sets the size for all icons on the page
-  var selectedIndex = 0; // sets the page on the navbar, has state
+  var selectedIndex = 0; // sets the selected page on the navbar, state-aware
 
   @override
   Widget build(BuildContext context) {
+    // Handle page selection
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = GeneratorPage();
+      case 1:
+        page = Placeholder();
+      default:
+        throw UnimplementedError('No widget for $selectedIndex');
+    }
+
     return Scaffold(
       body: Row(
         children: [
@@ -108,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: Container(
               color: Theme.of(context).colorScheme.primaryContainer,
-              child: GeneratorPage(),
+              child: page,
             ),
           ),
         ],
