@@ -37,7 +37,8 @@ class MyApp extends StatelessWidget {
 // This class encapsulates the state of the entire application.
 //
 // In this case, the only state which is being tracked is the
-// word-pair to be displayed on the main page.
+// word-pair to be displayed on the main page along with a collection
+// of favorites.
 class MyAppState extends ChangeNotifier {
   var currentWord = WordPair.random(); // generate initial word-pair
   var favorites = <WordPair>[]; // to save favorite word-pairs
@@ -61,59 +62,109 @@ class MyAppState extends ChangeNotifier {
 }
 
 // This class encapsulates the content of the main home page.
-class MyHomePage extends StatelessWidget {
+//
+// Here, we have refactored the home page to be a stateful widget.
+class MyHomePage extends StatefulWidget {
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  var iconSize = 40.0;
+  var selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                NavigationRailDestination(
+                  icon: Icon(
+                    Icons.home,
+                    size: iconSize,
+                  ),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(
+                    Icons.favorite,
+                    size: iconSize,
+                  ),
+                  label: Text('Favorites'),
+                ),
+              ],
+              selectedIndex: 0,
+              onDestinationSelected: (value) {
+                print('selected: $value');
+              },
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: GeneratorPage(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GeneratorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
     var wordPair = appState.currentWord;
 
     IconData favoritesIcon;
-
     if (appState.favorites.contains(wordPair)) {
       favoritesIcon = Icons.favorite;
     } else {
       favoritesIcon = Icons.favorite_border;
     }
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            BigCard(pair: wordPair),
-            SizedBox(height: 30),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      appState.toggleFavorite();
-                    },
-                    icon: Icon(favoritesIcon),
-                    label: Text(
-                      "Like",
-                      style: TextStyle(fontSize: 30), // Set the font size to 30
-                    ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          BigCard(pair: wordPair),
+          SizedBox(height: 30),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite();
+                  },
+                  icon: Icon(favoritesIcon),
+                  label: Text(
+                    "Like",
+                    style: TextStyle(fontSize: 30), // Set the font size to 30
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      appState.getNextWord();
-                    },
-                    child: Text(
-                      'Generate Word',
-                      style: TextStyle(fontSize: 30),
-                    ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    appState.getNextWord();
+                  },
+                  child: Text(
+                    'Generate Word',
+                    style: TextStyle(fontSize: 30),
                   ),
                 ),
-              ],
-            )
-          ],
-        ),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
