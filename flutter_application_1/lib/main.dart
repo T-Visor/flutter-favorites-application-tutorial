@@ -70,8 +70,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var iconSize = 40.0;
-  var selectedIndex = 0;
+  var iconSize = 40.0; // sets the size for all icons on the page
+  var selectedIndex = 0; // sets the page on the navbar, has state
 
   @override
   Widget build(BuildContext context) {
@@ -97,9 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   label: Text('Favorites'),
                 ),
               ],
-              selectedIndex: 0,
+              selectedIndex: selectedIndex,
               onDestinationSelected: (value) {
-                print('selected: $value');
+                setState(() {
+                  selectedIndex = value;
+                });
               },
             ),
           ),
