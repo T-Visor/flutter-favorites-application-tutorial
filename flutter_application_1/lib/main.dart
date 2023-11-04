@@ -72,6 +72,9 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var iconSize = 40.0; // sets the size for all icons on the page
+  var navbarFontSize = 23.0;
+  var minimumWidthToShowLabels = 600; // number in logical pixels
+
   var selectedIndex = 0; // sets the selected page on the navbar, state-aware
 
   @override
@@ -82,50 +85,60 @@ class _MyHomePageState extends State<MyHomePage> {
       case 0:
         page = GeneratorPage();
       case 1:
-        page = Placeholder();
+        page = FavoritesPage();
       default:
         throw UnimplementedError('No widget for $selectedIndex');
     }
 
-    return Scaffold(
-      body: Row(
-        children: [
-          SafeArea(
-            child: NavigationRail(
-              extended: false,
-              destinations: [
-                NavigationRailDestination(
-                  icon: Icon(
-                    Icons.home,
-                    size: iconSize,
+    return LayoutBuilder(builder: (context, constraints) {
+      return Scaffold(
+        body: Row(
+          children: [
+            SafeArea(
+              child: NavigationRail(
+                extended: constraints.maxWidth >= minimumWidthToShowLabels,
+                destinations: [
+                  NavigationRailDestination(
+                    icon: Icon(
+                      Icons.home,
+                      size: iconSize,
+                    ),
+                    label: Text('Home',
+                        style: TextStyle(
+                            fontSize: navbarFontSize,
+                            fontWeight: FontWeight.bold)),
                   ),
-                  label: Text('Home'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(
-                    Icons.favorite,
-                    size: iconSize,
+                  NavigationRailDestination(
+                    icon: Icon(
+                      Icons.favorite,
+                      size: iconSize,
+                    ),
+                    label: Text(
+                      'Favorites',
+                      style: TextStyle(
+                          fontSize: navbarFontSize,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  label: Text('Favorites'),
-                ),
-              ],
-              selectedIndex: selectedIndex,
-              onDestinationSelected: (value) {
-                setState(() {
-                  selectedIndex = value;
-                });
-              },
+                ],
+                selectedIndex: selectedIndex,
+                onDestinationSelected: (value) {
+                  setState(() {
+                    selectedIndex = value;
+                  });
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              child: page,
+            Expanded(
+              child: Container(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                child: page,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -208,6 +221,43 @@ class BigCard extends StatelessWidget {
           style: style,
           semanticsLabel: "${pair.first} ${pair.second}",
         ),
+      ),
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    if (appState.favorites.isEmpty) {
+      return Center(
+        child: Text(
+          'No favorites yet.',
+          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+
+    return Center(
+      child: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              'You have ${appState.favorites.length} favorites:',
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            ),
+          ),
+          ...appState.favorites.map((pair) => ListTile(
+                leading: Icon(Icons.favorite),
+                title: Text(
+                  pair.toString().toLowerCase(),
+                  style: TextStyle(fontSize: 25),
+                ),
+              )),
+        ],
       ),
     );
   }
