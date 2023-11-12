@@ -246,7 +246,7 @@ class FavoritesPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Text(
-              'You have ${appState.favorites.length} favorites:',
+              'You have ${appState.favorites.length} favorite(s):',
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
           ),
